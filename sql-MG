@@ -1,0 +1,67 @@
+--find the total sales ($$) and number of orders per month in the database (northwind).
+-- don't worry about months with no sales.
+
+SELECT EXTRACT(MONTH FROM o.order_date) as month,
+northwind-# SUM(od.unit_price) as sales_total,
+northwind-# COUNT(od.order_id) as orders_total
+northwind-# FROM order_details as od 
+northwind-# JOIN orders as o 
+northwind-# ON od.order_id = o.order_id
+northwind-# GROUP BY month
+northwind-# ORDER BY month ASC;
+
+WITH orders_info as (
+northwind(#     SELECT EXTRACT(MONTH FROM o.order_date) as month,
+northwind(# SUM(od.unit_price) as sales_total,
+northwind(# COUNT(od.order_id) as orders_total
+northwind(# FROM order_details as od 
+northwind(# JOIN orders as o 
+northwind(# ON od.order_id = o.order_id
+northwind(# GROUP BY month
+northwind(# ORDER BY month ASC
+northwind(# )
+northwind-# 
+northwind-# SELECT month, orders_total, AVG(sales_total) 
+northwind-# OVER (PARTITION BY month ORDER BY month ASC) as avg_sales_total
+northwind-# FROM orders_info;
+
+WITH orders_info as (
+    SELECT DATE_TRUNC('year', o.order_date) as yyyy,
+    DATE_TRUNC('month', o.order_date) as mm,
+SUM(od.unit_price) as sales,
+COUNT(od.order_id) as monthly_orders,
+FROM order_details as od 
+JOIN orders as o 
+ON od.order_id = o.order_id
+GROUP BY yyyy, mm
+ORDER BY yyyy, mm ASC
+)
+
+SELECT TO_DATE('yyyy-mm') AS date_txt_yyyymm, orders_total, sales
+OVER (PARTITION BY date_txt_yyyymm ORDER BY date_txt_yyyymm ASC)
+FROM orders_info;
+
+SELECT *
+FROM orders as o
+JOIN order_details
+
+
+
+-- Which month has the highest average sales ($$) over every year of the database?
+--(hint you can either start from scratch or make use of the previous answer)
+
+WITH orders_info as (
+    SELECT EXTRACT(MONTH FROM o.order_date) as month,
+    EXTRACT(YEAR FROM o.order_date) as year,
+SUM(od.unit_price) as sales_total,
+COUNT(od.order_id) as orders_total
+FROM order_details as od 
+JOIN orders as o 
+ON od.order_id = o.order_id
+GROUP BY year, month
+ORDER BY year, month ASC
+)
+
+SELECT year, month, orders_total, ROUND(AVG(sales_total) 
+OVER (PARTITION BY month ORDER BY month ASC), 2) as avg_sales_total
+FROM orders_info;
